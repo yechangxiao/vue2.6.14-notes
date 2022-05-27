@@ -13,15 +13,18 @@ const idToTemplate = cached(id => {
   const el = query(id)
   return el && el.innerHTML
 })
-
+// 保存Vue实例的$mount方法
 const mount = Vue.prototype.$mount
 Vue.prototype.$mount = function (
   el?: string | Element,
+  // 非ssr下为false，ssr时候为true
   hydrating?: boolean
 ): Component {
+  // 获取el对象
   el = el && query(el)
 
   /* istanbul ignore if */
+  // el不能是body或者html
   if (el === document.body || el === document.documentElement) {
     process.env.NODE_ENV !== 'production' && warn(
       `Do not mount Vue to <html> or <body> - mount to normal elements instead.`
@@ -31,11 +34,16 @@ Vue.prototype.$mount = function (
 
   const options = this.$options
   // resolve template/el and convert to render function
+  // 把template/el转换成render函数
+  // 因此如果template和render函数同时存在，会执行render函数
   if (!options.render) {
     let template = options.template
+    // 如果模板存在
     if (template) {
       if (typeof template === 'string') {
+        // 如果模板是id选择器
         if (template.charAt(0) === '#') {
+          // 获取对应的DOM对象的innerHTML
           template = idToTemplate(template)
           /* istanbul ignore if */
           if (process.env.NODE_ENV !== 'production' && !template) {
@@ -46,6 +54,7 @@ Vue.prototype.$mount = function (
           }
         }
       } else if (template.nodeType) {
+        // 模板也可以为一个DOM元素
         template = template.innerHTML
       } else {
         if (process.env.NODE_ENV !== 'production') {
@@ -54,9 +63,11 @@ Vue.prototype.$mount = function (
         return this
       }
     } else if (el) {
+      // 如果没有模板，获取el元素（包括其后代）的序列化HTML片段
       template = getOuterHTML(el)
     }
     if (template) {
+      // 将template编译成render函数
       /* istanbul ignore if */
       if (process.env.NODE_ENV !== 'production' && config.performance && mark) {
         mark('compile')
@@ -79,6 +90,7 @@ Vue.prototype.$mount = function (
       }
     }
   }
+  // 调用mount方法，渲染DOM
   return mount.call(this, el, hydrating)
 }
 
