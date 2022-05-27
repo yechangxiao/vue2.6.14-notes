@@ -15,6 +15,7 @@ const idToTemplate = cached(id => {
 })
 // 保存Vue实例的$mount方法
 const mount = Vue.prototype.$mount
+// 重写平台相关的$mount()方法
 Vue.prototype.$mount = function (
   el?: string | Element,
   // 非ssr下为false，ssr时候为true
@@ -107,7 +108,7 @@ function getOuterHTML (el: Element): string {
     return container.innerHTML
   }
 }
-
+// 注册compile方法
 Vue.compile = compileToFunctions
 
 export default Vue
