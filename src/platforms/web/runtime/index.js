@@ -20,6 +20,8 @@ import platformDirectives from './directives/index'
 import platformComponents from './components/index'
 
 // install platform specific utils
+// 判断是否是一些标签的关键属性(表单元素的input/checked/selected/muted)
+// 如果是这些属性，设置el.props属性(属性不设置到标签上)
 Vue.config.mustUseProp = mustUseProp
 Vue.config.isReservedTag = isReservedTag
 Vue.config.isReservedAttr = isReservedAttr
@@ -27,6 +29,8 @@ Vue.config.getTagNamespace = getTagNamespace
 Vue.config.isUnknownElement = isUnknownElement
 
 // install platform runtime directives & components
+// extend就是将第二个对象的属性复制到第一个对象中
+// 全局的指令/组件会存放在Vue.options.directives/components中
 extend(Vue.options.directives, platformDirectives)
 extend(Vue.options.components, platformComponents)
 
