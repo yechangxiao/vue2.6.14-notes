@@ -16,10 +16,13 @@ export function initExtend (Vue: GlobalAPI) {
   /**
    * Class inheritance
    */
+  // 接收一个选项对象
   Vue.extend = function (extendOptions: Object): Function {
     extendOptions = extendOptions || {}
+    // this为Vue构造函数
     const Super = this
     const SuperId = Super.cid
+    // 从缓存中加载组件的构造函数
     const cachedCtors = extendOptions._Ctor || (extendOptions._Ctor = {})
     if (cachedCtors[SuperId]) {
       return cachedCtors[SuperId]
@@ -27,15 +30,19 @@ export function initExtend (Vue: GlobalAPI) {
 
     const name = extendOptions.name || Super.options.name
     if (process.env.NODE_ENV !== 'production' && name) {
+      // 开发环境下验证组件的名称
       validateComponentName(name)
     }
 
     const Sub = function VueComponent (options) {
+      // 调用_init()初始化
       this._init(options)
     }
+    // 原型继承Vue
     Sub.prototype = Object.create(Super.prototype)
     Sub.prototype.constructor = Sub
     Sub.cid = cid++
+    // 合并Vue定义的options和传入的options
     Sub.options = mergeOptions(
       Super.options,
       extendOptions
@@ -53,6 +60,7 @@ export function initExtend (Vue: GlobalAPI) {
     }
 
     // allow further extension/mixin/plugin usage
+    // 将Vue中的extend/mixin/use拷贝到组件的构造函数上面
     Sub.extend = Super.extend
     Sub.mixin = Super.mixin
     Sub.use = Super.use
@@ -75,6 +83,7 @@ export function initExtend (Vue: GlobalAPI) {
     Sub.sealedOptions = extend({}, Sub.options)
 
     // cache constructor
+    // 把组件的构造函数缓存到options._Ctor中
     cachedCtors[SuperId] = Sub
     return Sub
   }
