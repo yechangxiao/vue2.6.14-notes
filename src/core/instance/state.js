@@ -339,9 +339,11 @@ export function stateMixin (Vue: Class<Component>) {
       warn(`$props is readonly.`, this)
     }
   }
+  // 把实例上的_data和_props赋给$data和$props
   Object.defineProperty(Vue.prototype, '$data', dataDef)
   Object.defineProperty(Vue.prototype, '$props', propsDef)
 
+  // 和Vue.set/Vue.delete是一样的
   Vue.prototype.$set = set
   Vue.prototype.$delete = del
 
@@ -350,12 +352,16 @@ export function stateMixin (Vue: Class<Component>) {
     cb: any,
     options?: Object
   ): Function {
+    // 获取Vue实例this
     const vm: Component = this
     if (isPlainObject(cb)) {
+      // 判断如果cb是对象，执行createWatcher
       return createWatcher(vm, expOrFn, cb, options)
     }
     options = options || {}
+    // 标记为用户watcher
     options.user = true
+    // 创建用户watcher对象
     const watcher = new Watcher(vm, expOrFn, cb, options)
     if (options.immediate) {
       const info = `callback for immediate watcher "${watcher.expression}"`
