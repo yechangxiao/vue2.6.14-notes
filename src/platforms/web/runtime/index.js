@@ -29,7 +29,7 @@ Vue.config.getTagNamespace = getTagNamespace
 Vue.config.isUnknownElement = isUnknownElement
 
 // install platform runtime directives & components
-// extend就是将第二个对象的属性复制到第一个对象中
+// extend就是将第二个对象浅拷贝到第一个对象中
 // 全局的指令/组件会存放在Vue.options.directives/components中
 extend(Vue.options.directives, platformDirectives)
 extend(Vue.options.components, platformComponents)

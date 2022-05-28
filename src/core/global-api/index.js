@@ -8,6 +8,7 @@ import { initAssetRegisters } from './assets'
 import { set, del } from '../observer/index'
 import { ASSET_TYPES } from 'shared/constants'
 import builtInComponents from '../components/index'
+// 对于没有./或者../的路径，则是相对于src的路径
 import { observe } from 'core/observer/index'
 
 import {
