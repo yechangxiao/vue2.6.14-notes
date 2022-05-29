@@ -18,6 +18,7 @@ export function isReserved (str: string): boolean {
 /**
  * Define a property.
  */
+// 对defineProperty进行封装，为了对于一些不需要被遍历的属性设置enumerable为false
 export function def (obj: Object, key: string, val: any, enumerable?: boolean) {
   Object.defineProperty(obj, key, {
     value: val,

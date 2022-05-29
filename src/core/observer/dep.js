@@ -11,8 +11,11 @@ let uid = 0
  * directives subscribing to it.
  */
 export default class Dep {
+  // 静态属性，watcher对象
   static target: ?Watcher;
+  // dep实例Id
   id: number;
+  // dep实例对应的watcher对象/订阅者数组
   subs: Array<Watcher>;
 
   constructor () {
@@ -20,10 +23,12 @@ export default class Dep {
     this.subs = []
   }
 
+  // 添加新的订阅者watcher对象
   addSub (sub: Watcher) {
     this.subs.push(sub)
   }
 
+  // 移除订阅者
   removeSub (sub: Watcher) {
     remove(this.subs, sub)
   }
@@ -52,15 +57,19 @@ export default class Dep {
 // The current target watcher being evaluated.
 // This is globally unique because only one watcher
 // can be evaluated at a time.
+// Dep.target用来存放目前正在使用的watcher
+// 全局唯一，并且一次也只能有一个watcher被使用
 Dep.target = null
 const targetStack = []
-
+// 入栈并将当前watcher赋值给Dep.target
+// 使用这个栈的目的是有父子组件嵌套，每一个组件都有一个watcher，把父组件先存到栈中，然后渲染完的栈就弹出
 export function pushTarget (target: ?Watcher) {
   targetStack.push(target)
   Dep.target = target
 }
 
 export function popTarget () {
+  // 出栈操作
   targetStack.pop()
   Dep.target = targetStack[targetStack.length - 1]
 }
