@@ -43,6 +43,7 @@ export default class Watcher {
   getter: Function;
   value: any;
 
+  // 有三种watcher，渲染watcher/computed watcher/ 侦听器watcher
   constructor (
     vm: Component,
     expOrFn: string | Function,
@@ -59,6 +60,7 @@ export default class Watcher {
     if (options) {
       this.deep = !!options.deep
       this.user = !!options.user
+      // 是否延迟执行，computed中的watcher需要延迟执行
       this.lazy = !!options.lazy
       this.sync = !!options.sync
       this.before = options.before
@@ -100,6 +102,7 @@ export default class Watcher {
    * Evaluate the getter, and re-collect dependencies.
    */
   get () {
+    // 如果是组件，需要把父组件的watcher先保存起来
     pushTarget(this)
     let value
     const vm = this.vm

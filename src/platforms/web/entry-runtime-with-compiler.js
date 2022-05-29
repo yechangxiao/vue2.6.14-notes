@@ -14,6 +14,8 @@ const idToTemplate = cached(id => {
   return el && el.innerHTML
 })
 // 保存Vue实例的$mount方法
+// 在重写了$mount()方法后，依旧调用了原Vue实例中的mount方法
+// mount并不等于修改后的$mount，因为$mount被重新赋值了，而mount引用的是旧的$mount
 const mount = Vue.prototype.$mount
 // 重写平台相关的$mount()方法
 Vue.prototype.$mount = function (

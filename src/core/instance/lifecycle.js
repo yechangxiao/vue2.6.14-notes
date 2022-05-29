@@ -168,6 +168,7 @@ export function mountComponent (
   }
   callHook(vm, 'beforeMount')
 
+  // 更新组件，其实就是挂载
   let updateComponent
   /* istanbul ignore if */
   if (process.env.NODE_ENV !== 'production' && config.performance && mark) {
