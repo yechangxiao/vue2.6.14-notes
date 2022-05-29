@@ -49,7 +49,9 @@ export function proxy (target: Object, sourceKey: string, key: string) {
 export function initState (vm: Component) {
   vm._watchers = []
   const opts = vm.$options
+  // 将props中的数据转化为响应式数据注入到vm中的_props中
   if (opts.props) initProps(vm, opts.props)
+  // 初始化methods，将methods注入到vm中，并绑定this为vm
   if (opts.methods) initMethods(vm, opts.methods)
   if (opts.data) {
     initData(vm)
@@ -112,6 +114,8 @@ function initProps (vm: Component, propsOptions: Object) {
 
 function initData (vm: Component) {
   let data = vm.$options.data
+  // 初始化_data，组件中data是函数，调用函数返回结果
+  // 否则直接返回data
   data = vm._data = typeof data === 'function'
     ? getData(data, vm)
     : data || {}
@@ -124,10 +128,13 @@ function initData (vm: Component) {
     )
   }
   // proxy data on instance
+  // 获取data中的所有属性
   const keys = Object.keys(data)
+  // 获取props/methods
   const props = vm.$options.props
   const methods = vm.$options.methods
   let i = keys.length
+  // 判断data上的属性是否和props/methods中的属性重名
   while (i--) {
     const key = keys[i]
     if (process.env.NODE_ENV !== 'production') {
@@ -145,10 +152,12 @@ function initData (vm: Component) {
         vm
       )
     } else if (!isReserved(key)) {
+      // 对于不是_/$开头的属性，注入到vm中
       proxy(vm, `_data`, key)
     }
   }
   // observe data
+  // 响应式处理
   observe(data, true /* asRootData */)
 }
 
@@ -266,6 +275,7 @@ function initMethods (vm: Component, methods: Object) {
   const props = vm.$options.props
   for (const key in methods) {
     if (process.env.NODE_ENV !== 'production') {
+      // 判断methods是否为一个函数
       if (typeof methods[key] !== 'function') {
         warn(
           `Method "${key}" has type "${typeof methods[key]}" in the component definition. ` +
@@ -273,12 +283,14 @@ function initMethods (vm: Component, methods: Object) {
           vm
         )
       }
+      // 判断methods中名称是否和props重复
       if (props && hasOwn(props, key)) {
         warn(
           `Method "${key}" has already been defined as a prop.`,
           vm
         )
       }
+      // 判断methods名称是否与vue中定义的_或者$开头的私有属性名称冲突
       if ((key in vm) && isReserved(key)) {
         warn(
           `Method "${key}" conflicts with an existing Vue instance method. ` +
@@ -286,6 +298,7 @@ function initMethods (vm: Component, methods: Object) {
         )
       }
     }
+    // methods属性不是函数，则返回空函数，否则将methods中的this绑定到Vue实例中
     vm[key] = typeof methods[key] !== 'function' ? noop : bind(methods[key], vm)
   }
 }
