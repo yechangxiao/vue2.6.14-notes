@@ -103,6 +103,7 @@ export default class Watcher {
    */
   get () {
     // 如果是组件，需要把父组件的watcher先保存起来
+    // 给Dep.target赋值，进行依赖收集
     pushTarget(this)
     let value
     const vm = this.vm
@@ -133,6 +134,7 @@ export default class Watcher {
     const id = dep.id
     if (!this.newDepIds.has(id)) {
       this.newDepIds.add(id)
+      // watcher中也存了dep，为了处理一个很小的问题
       this.newDeps.push(dep)
       if (!this.depIds.has(id)) {
         // 就是将watcher添加到dep的subs数组中

@@ -130,6 +130,8 @@ export function observe (value: any, asRootData: ?boolean): Observer | void {
     shouldObserve &&
     !isServerRendering() &&
     (Array.isArray(value) || isPlainObject(value)) &&
+    // 对象是否可被扩展，通过Object.preventExtensions/seal/freeze可以标记对象不可扩展
+    // 通过这样处理可以让数据不被观察
     Object.isExtensible(value) &&
     // 如果是vue实例则不进行响应式处理
     !value._isVue
@@ -183,10 +185,12 @@ export function defineReactive (
       // 否则直接赋值属性值
       const value = getter ? getter.call(obj) : val
       // 如果当前存在依赖目标，即watcher对象，则建立依赖
+      // 在watcher的get方法中对Dep.target进行赋值
       if (Dep.target) {
         dep.depend()
         // 如果子观察目标存在，建立子对象的依赖关系
         if (childOb) {
+          // 每一个observe对象中都有一个dep属性，存放了依赖对象实例
           childOb.dep.depend()
           // 如果属性是数组，则特殊处理收集数组对象依赖
           if (Array.isArray(value)) {

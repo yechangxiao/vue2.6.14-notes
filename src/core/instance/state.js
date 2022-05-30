@@ -153,6 +153,7 @@ function initData (vm: Component) {
       )
     } else if (!isReserved(key)) {
       // 对于不是_/$开头的属性，注入到vm中
+      // 当获取vm.key的时候，是从vm._data.key中获取的
       proxy(vm, `_data`, key)
     }
   }
