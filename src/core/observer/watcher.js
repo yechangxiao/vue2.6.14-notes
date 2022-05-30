@@ -102,12 +102,13 @@ export default class Watcher {
    * Evaluate the getter, and re-collect dependencies.
    */
   get () {
-    // 如果是组件，需要把父组件的watcher先保存起来
+    // 如果是组件，需要把父组件的watcher先保存起来，先渲染内部的组件
     // 给Dep.target赋值，进行依赖收集
     pushTarget(this)
     let value
     const vm = this.vm
     try {
+      // 真正调用updateComponent渲染视图
       value = this.getter.call(vm, vm)
     } catch (e) {
       if (this.user) {

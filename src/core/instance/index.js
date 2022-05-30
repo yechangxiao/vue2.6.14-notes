@@ -13,6 +13,8 @@ function Vue (options) {
   }
   this._init(options)
 }
+/* 以下方法都是给Vue.prototype中注入属性和方法 */
+
 // 注册vm的_init()方法，初始化vm
 initMixin(Vue)
 // 注册vm的$data/$props/$set/$delete/$watch

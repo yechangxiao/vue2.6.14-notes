@@ -19,6 +19,8 @@ import { patch } from './patch'
 import platformDirectives from './directives/index'
 import platformComponents from './components/index'
 
+/* 以下都是给Vue注册一些平台相关的静态方法/属性和原型方法/属性 */
+
 // install platform specific utils
 // 判断是否是一些标签的关键属性(表单元素的input/checked/selected/muted)
 // 如果是这些属性，设置el.props属性(属性不设置到标签上)
