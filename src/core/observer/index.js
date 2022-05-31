@@ -56,7 +56,10 @@ export class Observer {
     def(value, '__ob__', this)
     // 数组的响应式处理
     if (Array.isArray(value)) {
+      // 判断浏览器是否支持__proto__属性，用于浏览器兼容
       if (hasProto) {
+        // protoAugment仅仅把value的原型__proto__设置为arrayMethods
+        // arrayMethods用于修补一些需要进行响应式处理的方法
         protoAugment(value, arrayMethods)
       } else {
         copyAugment(value, arrayMethods, arrayKeys)
