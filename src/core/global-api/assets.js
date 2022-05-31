@@ -15,7 +15,7 @@ export function initAssetRegisters (Vue: GlobalAPI) {
       definition: Function | Object
     ): Function | Object | void {
       if (!definition) {
-        // 获取对应的组件、指令、过滤器
+        // 没有传第二个参数，则获取对应的组件、指令、过滤器
         return this.options[type + 's'][id]
       } else {
         /* istanbul ignore if */

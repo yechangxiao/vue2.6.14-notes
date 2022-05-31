@@ -38,6 +38,9 @@ export function initMixin (Vue: Class<Component>) {
       // optimize internal component instantiation
       // since dynamic options merging is pretty slow, and none of the
       // internal component options needs special treatment.
+      //优化内部组件实例化
+      //因为动态选项合并速度非常慢
+      //内部组件选项需要特殊处理
       initInternalComponent(vm, options)
     } else {
       vm.$options = mergeOptions(
@@ -51,7 +54,7 @@ export function initMixin (Vue: Class<Component>) {
       // 渲染时候的代理对象，什么作用？
       initProxy(vm)
     } else {
-      // _renderProxy这个属性有什么作用？
+      // _renderProxy在渲染的时候被使用
       vm._renderProxy = vm
     }
     // expose real self
@@ -61,13 +64,16 @@ export function initMixin (Vue: Class<Component>) {
     // vm事件监听初始化，父组件绑定在当前组件上的事件
     initEvents(vm)
     // vm的编译render初始化
-    // $slots/$scopedSlots/_c/$createElement/$attrs/$listeners
+    // $slots/$scopedSlots
+    // _c: 对模板编译生成的render函数进行渲染的方法
+    // $createElement: 对手写的render函数进行渲染的方法，h函数
+    // $attrs/$listeners
     initRender(vm)
     // beforeCreate生命周期钩子的回调
     callHook(vm, 'beforeCreate')
     // 把inject的成员注入到vm上
     initInjections(vm) // resolve injections before data/props
-    // 初始化vm的_props/methods/_data/computed/watch
+    // 初始化vm的props/methods/data/computed/watch
     initState(vm)
     // 初始化provide
     initProvide(vm) // resolve provide after data/props

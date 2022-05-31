@@ -3,7 +3,9 @@
 import { toArray } from '../util/index'
 
 export function initUse (Vue: GlobalAPI) {
+  // Vue.use也就是调用了插件的install方法
   Vue.use = function (plugin: Function | Object) {
+    // 保存已安装的插件
     const installedPlugins = (this._installedPlugins || (this._installedPlugins = []))
     // 防止插件被多次注册
     if (installedPlugins.indexOf(plugin) > -1) {

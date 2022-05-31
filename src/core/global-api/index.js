@@ -31,6 +31,7 @@ export function initGlobalAPI (Vue: GlobalAPI) {
     }
   }
   // 初始化Vue.config对象
+  // 后面我们在src/platforms/web/runtime/index.js中添加了一些属性
   Object.defineProperty(Vue, 'config', configDef)
 
   // exposed util methods.

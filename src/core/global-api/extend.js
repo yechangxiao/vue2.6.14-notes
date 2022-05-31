@@ -67,10 +67,12 @@ export function initExtend (Vue: GlobalAPI) {
 
     // create asset registers, so extended classes
     // can have their private assets too.
+    // 将Vue中的component/directive/filter方法拷贝到组件的构造函数上
     ASSET_TYPES.forEach(function (type) {
       Sub[type] = Super[type]
     })
     // enable recursive self-lookup
+    // 把组件构造函数保存，用于通过name递归调用组件
     if (name) {
       Sub.options.components[name] = Sub
     }

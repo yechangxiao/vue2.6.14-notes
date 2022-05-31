@@ -50,14 +50,19 @@ export function initState (vm: Component) {
   vm._watchers = []
   const opts = vm.$options
   // 将props中的数据转化为响应式数据注入到vm中的_props中
+  // 并且将props数据注入到vm实例中，可通过this进行访问
   if (opts.props) initProps(vm, opts.props)
-  // 初始化methods，将methods注入到vm中，并绑定this为vm
+  // 初始化methods，将methods注入到vm中
+  // 判断是否与props重名，并绑定函数的this为vm实例
   if (opts.methods) initMethods(vm, opts.methods)
+  // 将data中的数据注入到vm实例中，并转换为响应式数据
+  // 判断是否与props/methods重名
   if (opts.data) {
     initData(vm)
   } else {
     observe(vm._data = {}, true /* asRootData */)
   }
+  // 初始化computed，创建watcher
   if (opts.computed) initComputed(vm, opts.computed)
   if (opts.watch && opts.watch !== nativeWatch) {
     initWatch(vm, opts.watch)
@@ -66,6 +71,7 @@ export function initState (vm: Component) {
 
 function initProps (vm: Component, propsOptions: Object) {
   const propsData = vm.$options.propsData || {}
+  // 定义vm._props用于存放响应式的props属性
   const props = vm._props = {}
   // cache prop keys so that future props updates can iterate using Array
   // instead of dynamic object key enumeration.
@@ -100,11 +106,14 @@ function initProps (vm: Component, propsOptions: Object) {
         }
       })
     } else {
+      // 将props属性定义成响应式数据
       defineReactive(props, key, value)
     }
     // static props are already proxied on the component's prototype
     // during Vue.extend(). We only need to proxy props defined at
     // instantiation here.
+    // 将props属性注入到vm实例中，便于通过this访问
+    // 通过thi访问的属性也是通过vm._props获取的
     if (!(key in vm)) {
       proxy(vm, `_props`, key)
     }
@@ -285,6 +294,7 @@ function initMethods (vm: Component, methods: Object) {
         )
       }
       // 判断methods中名称是否和props重复
+      // 因为methods和props都会注入到vm实例中，不能有同名属性
       if (props && hasOwn(props, key)) {
         warn(
           `Method "${key}" has already been defined as a prop.`,
@@ -292,6 +302,7 @@ function initMethods (vm: Component, methods: Object) {
         )
       }
       // 判断methods名称是否与vue中定义的_或者$开头的私有属性名称冲突
+      // 因为vue中_和$开头的都是私有成员，不建议这样命名
       if ((key in vm) && isReserved(key)) {
         warn(
           `Method "${key}" conflicts with an existing Vue instance method. ` +
@@ -299,7 +310,8 @@ function initMethods (vm: Component, methods: Object) {
         )
       }
     }
-    // methods属性不是函数，则返回空函数，否则将methods中的this绑定到Vue实例中
+    // methods属性不是函数，则返回空函数
+    // 是函数将methods中的this绑定到Vue实例中
     vm[key] = typeof methods[key] !== 'function' ? noop : bind(methods[key], vm)
   }
 }
@@ -354,6 +366,7 @@ export function stateMixin (Vue: Class<Component>) {
     }
   }
   // 把实例上的_data和_props赋给$data和$props
+  // 使用defineProperty进行定义是为了添加set方法，在开发模式下提供警告
   Object.defineProperty(Vue.prototype, '$data', dataDef)
   Object.defineProperty(Vue.prototype, '$props', propsDef)
 

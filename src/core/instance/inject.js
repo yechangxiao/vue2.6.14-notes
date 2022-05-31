@@ -17,6 +17,7 @@ export function initInjections (vm: Component) {
   // 依赖注入的实现
   const result = resolveInject(vm.$options.inject, vm)
   if (result) {
+    // 设置shouldObserve为false，后面读取属性的时候不让observer去观察
     toggleObserving(false)
     Object.keys(result).forEach(key => {
       /* istanbul ignore else */
@@ -52,6 +53,7 @@ export function resolveInject (inject: any, vm: Component): ?Object {
       const provideKey = inject[key].from
       let source = vm
       while (source) {
+        // 要判断属性是否在_provided中存在
         if (source._provided && hasOwn(source._provided, provideKey)) {
           result[key] = source._provided[provideKey]
           break
