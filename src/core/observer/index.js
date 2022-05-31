@@ -44,9 +44,14 @@ export class Observer {
 
   constructor (value: any) {
     this.value = value
+    // 每一个Observer实例都有一个dep对象，用于为子对象收集依赖
+    // 当子对象添加或删除成员的时候也需要进行发送通知
+    // 这个不同于defineReactive中的dep，是用于收集每一个属性的依赖
     this.dep = new Dep()
     // 初始化实例的vmCount为0
     this.vmCount = 0
+    // 对Object.defineProperty进行了封装，并将enumerable设为false
+    // 后续对value进行遍历设为get/set的时候就不会枚举__ob__属性
     // 将实例挂载到观察对象的__ob__属性上
     def(value, '__ob__', this)
     // 数组的响应式处理
@@ -127,6 +132,7 @@ export function observe (value: any, asRootData: ?boolean): Observer | void {
   if (hasOwn(value, '__ob__') && value.__ob__ instanceof Observer) {
     ob = value.__ob__
   } else if (
+    // 一个是否应该被观察的开关，用于处理不需要被观察的对象
     shouldObserve &&
     !isServerRendering() &&
     (Array.isArray(value) || isPlainObject(value)) &&
@@ -158,7 +164,7 @@ export function defineReactive (
   // 是否只遍历第一层的属性，而不进行深度遍历
   shallow?: boolean
 ) {
-  // 创建依赖对象实例
+  // 创建依赖对象实例，用于收集依赖
   const dep = new Dep()
   // 获取obj的属性描述符对象
   const property = Object.getOwnPropertyDescriptor(obj, key)
@@ -185,12 +191,15 @@ export function defineReactive (
       // 否则直接赋值属性值
       const value = getter ? getter.call(obj) : val
       // 如果当前存在依赖目标，即watcher对象，则建立依赖
-      // 在watcher的get方法中对Dep.target进行赋值
+      // 在创建watcher实例，调用get方法时对Dep.target进行赋值
+      // src/core/instance/lifecycle/mountComponent中创建watcher实例
       if (Dep.target) {
         dep.depend()
         // 如果子观察目标存在，建立子对象的依赖关系
         if (childOb) {
           // 每一个observe对象中都有一个dep属性，存放了依赖对象实例
+          // 注意：这个不同于上面的dep，上面的dep用于给每一个属性收集依赖
+          // 当子对象添加或删除成员的时候也需要进行发送通知
           childOb.dep.depend()
           // 如果属性是数组，则特殊处理收集数组对象依赖
           if (Array.isArray(value)) {
@@ -214,7 +223,7 @@ export function defineReactive (
       if (process.env.NODE_ENV !== 'production' && customSetter) {
         customSetter()
       }
-      // 如果没有setter直接返回
+      // 如果有getter没有setter，表示属性只读，直接返回
       // #7981: for accessor properties without setter
       if (getter && !setter) return
       // 如果用户设置了setter则调用，否则直接更新新值

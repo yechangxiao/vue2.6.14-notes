@@ -192,6 +192,7 @@ export function mountComponent (
     // 生成虚拟DOM，并将虚拟DOM转换成真实DOM，挂载到页面上
     updateComponent = () => {
       // vm._render()是调用用户传入或者生成器生成的render函数，返回虚拟DOM
+      // vm._render在scr/instance/render.js中96行被调用
       // vm._update是将虚拟DOM转换成真实DOM，更新到页面上
       vm._update(vm._render(), hydrating)
     }

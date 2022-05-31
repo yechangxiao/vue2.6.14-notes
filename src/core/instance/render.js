@@ -94,6 +94,8 @@ export function renderMixin (Vue: Class<Component>) {
       // when parent component is patched.
       currentRenderingInstance = vm
       // 生成虚拟DOM，vm.$createElement就是h函数
+      // 执行render函数的时候，会获取绑定的属性，应该属性都被转换成了get/set
+      // src/core/observer/index.js 186行触发get，然后进行依赖收集
       vnode = render.call(vm._renderProxy, vm.$createElement)
     } catch (e) {
       handleError(e, vm, `render`)

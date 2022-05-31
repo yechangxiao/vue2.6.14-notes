@@ -167,7 +167,7 @@ function initData (vm: Component) {
     }
   }
   // observe data
-  // 响应式处理
+  // 响应式处理入口
   observe(data, true /* asRootData */)
 }
 
