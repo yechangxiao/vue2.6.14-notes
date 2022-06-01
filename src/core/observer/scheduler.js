@@ -75,22 +75,28 @@ function flushSchedulerQueue () {
 
   // Sort queue before flush.
   // This ensures that:
+  // 父组件比子组件先更新，因为父组件比子组件先创建
   // 1. Components are updated from parent to child. (because parent is always
   //    created before the child)
+  // 组件的用户watcher比渲染watcher先执行，因为用户watcher比渲染watcher先创建
   // 2. A component's user watchers are run before its render watcher (because
   //    user watchers are created before the render watcher)
+  // 如果一个组件在父组件渲染的时候被销毁，应该被跳过
   // 3. If a component is destroyed during a parent component's watcher run,
   //    its watchers can be skipped.
+
   queue.sort((a, b) => a.id - b.id)
 
   // do not cache length because more watchers might be pushed
   // as we run existing watchers
   for (index = 0; index < queue.length; index++) {
     watcher = queue[index]
+    // 创建渲染watcher才有，用于触发beforeUpdate钩子函数
     if (watcher.before) {
       watcher.before()
     }
     id = watcher.id
+    // 将watcher id置为null，说明这个watcher已经被处理了，后面数据有变化的时候，可以再进行执行
     has[id] = null
     watcher.run()
     // in dev build, check and stop circular updates.
@@ -163,11 +169,14 @@ function callActivatedHooks (queue) {
  */
 export function queueWatcher (watcher: Watcher) {
   const id = watcher.id
+  // 防止watcher被重复处理
   if (has[id] == null) {
     has[id] = true
+    // queueWatcher队列是否正在被处理
     if (!flushing) {
       queue.push(watcher)
     } else {
+      // 将watcher放到队列合适的位置，择机进行处理
       // if already flushing, splice the watcher based on its id
       // if already past its id, it will be run next immediately.
       let i = queue.length - 1

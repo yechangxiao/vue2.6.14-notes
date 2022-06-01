@@ -52,11 +52,14 @@ export default class Watcher {
     isRenderWatcher?: boolean
   ) {
     this.vm = vm
+    // 是否是渲染watcher
     if (isRenderWatcher) {
       vm._watcher = this
     }
+    // 存储所有的watcher，包括渲染watcher、侦听watcher、computed watcher
     vm._watchers.push(this)
     // options
+    // 对于渲染watcher，会传入before函数，用于触发beforeUpdate生命周期钩子，其他的属性都为空
     if (options) {
       this.deep = !!options.deep
       this.user = !!options.user
@@ -82,6 +85,8 @@ export default class Watcher {
     if (typeof expOrFn === 'function') {
       this.getter = expOrFn
     } else {
+      // 当是侦听watcher的时候，expOrFn是字符串，例如：watcher: { 'person.name': function... }
+      // parsePath返回一个函数获取person.name的值，调用getter函数的时候会读取person.name，然后触发get，进行收集依赖
       this.getter = parsePath(expOrFn)
       if (!this.getter) {
         this.getter = noop
@@ -93,6 +98,7 @@ export default class Watcher {
         )
       }
     }
+    // 当是computed watcher的时候lazy为false
     this.value = this.lazy
       ? undefined
       : this.get()
@@ -186,6 +192,7 @@ export default class Watcher {
    * Will be called by the scheduler.
    */
   run () {
+    // watcher是否存活状态
     if (this.active) {
       const value = this.get()
       if (
