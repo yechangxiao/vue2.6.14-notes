@@ -12,7 +12,9 @@ let pending = false
 
 function flushCallbacks () {
   pending = false
+  // 将callbacks备份一份
   const copies = callbacks.slice(0)
+  // 将callbacks清空，方便继续添加callbacks
   callbacks.length = 0
   for (let i = 0; i < copies.length; i++) {
     copies[i]()
@@ -74,6 +76,7 @@ if (typeof Promise !== 'undefined' && isNative(Promise)) {
   // Fallback to setImmediate.
   // Technically it leverages the (macro) task queue,
   // but it is still a better choice than setTimeout.
+  // 只在IE和node中支持，比setTimeout更好，会立即执行，setTimeout即使为0依旧要4ms后执行
   timerFunc = () => {
     setImmediate(flushCallbacks)
   }
@@ -86,9 +89,11 @@ if (typeof Promise !== 'undefined' && isNative(Promise)) {
 
 export function nextTick (cb?: Function, ctx?: Object) {
   let _resolve
+  // 把cb加上异常处理存入callbacks数组中
   callbacks.push(() => {
     if (cb) {
       try {
+        // 调cb()
         cb.call(ctx)
       } catch (e) {
         handleError(e, ctx, 'nextTick')
@@ -99,10 +104,12 @@ export function nextTick (cb?: Function, ctx?: Object) {
   })
   if (!pending) {
     pending = true
+    // 调用
     timerFunc()
   }
   // $flow-disable-line
   if (!cb && typeof Promise !== 'undefined') {
+    // 返回promise对象
     return new Promise(resolve => {
       _resolve = resolve
     })

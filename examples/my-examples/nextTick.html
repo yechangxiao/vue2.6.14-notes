@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+</head>
+<body>
+  <div id="app">
+    <h1 ref="msg">{{ msg }}</h1>
+    <button @click="test">ddddd</button>
+  </div>
+  <script src="../../dist/vue.js"></script>
+  <script>
+    const vm = new Vue({
+      el: '#app',
+      data: {
+        msg: 'hello world',
+      },
+      methods: {
+        test() {
+          Promise.resolve().then(
+            () => {
+              console.log(this.msg, 0)
+              console.log(this.$refs.msg.innerHTML, 0)
+            }
+            )
+          this.msg = '12345'
+          Promise.resolve().then(
+            () => {
+              console.log(this.msg, 1)
+              console.log(this.$refs.msg.innerHTML, 1)
+            }
+            )
+          this.$nextTick(() => {
+            console.log(this.msg, 2)
+            console.log(this.$refs.msg.innerHTML, 2)
+          })
+        }
+      }
+    })
+  </script>
+</body>
+</html>
