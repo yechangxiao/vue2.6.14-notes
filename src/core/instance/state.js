@@ -184,6 +184,7 @@ export function getData (data: Function, vm: Component): any {
   }
 }
 
+// 计算属性创建的watcher,lazy为true
 const computedWatcherOptions = { lazy: true }
 
 function initComputed (vm: Component, computed: Object) {
@@ -194,6 +195,7 @@ function initComputed (vm: Component, computed: Object) {
 
   for (const key in computed) {
     const userDef = computed[key]
+    // 计算属性可以定义成函数或者具有get/set的对象
     const getter = typeof userDef === 'function' ? userDef : userDef.get
     if (process.env.NODE_ENV !== 'production' && getter == null) {
       warn(
@@ -320,6 +322,7 @@ function initMethods (vm: Component, methods: Object) {
 function initWatch (vm: Component, watch: Object) {
   for (const key in watch) {
     const handler = watch[key]
+    // 我们定义侦听器的时候可以传入回调数组，它们会被逐一调用
     if (Array.isArray(handler)) {
       for (let i = 0; i < handler.length; i++) {
         createWatcher(vm, key, handler[i])
@@ -336,10 +339,12 @@ function createWatcher (
   handler: any,
   options?: Object
 ) {
+  // 传入的是对象，里面有handler函数
   if (isPlainObject(handler)) {
     options = handler
     handler = handler.handler
   }
+  // 传入的是字符串，则去vue实例中获取对应的methods
   if (typeof handler === 'string') {
     handler = vm[handler]
   }
@@ -384,20 +389,24 @@ export function stateMixin (Vue: Class<Component>) {
     // 获取Vue实例this
     const vm: Component = this
     if (isPlainObject(cb)) {
-      // 判断如果cb是对象，执行createWatcher
+      // 判断如果cb是对象，执行createWatcher继续对象进行解析
       return createWatcher(vm, expOrFn, cb, options)
     }
     options = options || {}
     // 标记为用户watcher
+    // 当执行用户watcher的时候，需要进行错误处理
     options.user = true
     // 创建用户watcher对象
     const watcher = new Watcher(vm, expOrFn, cb, options)
     if (options.immediate) {
+      // 立即执行一次cb回调，并且把watcher.value的值传入
       const info = `callback for immediate watcher "${watcher.expression}"`
       pushTarget()
+      // 在一个具有错误处理的函数中执行，因为用户传递的cb不一定进行了错误处理
       invokeWithErrorHandling(cb, vm, [watcher.value], vm, info)
       popTarget()
     }
+    // 返回取消监听的方法
     return function unwatchFn () {
       watcher.teardown()
     }

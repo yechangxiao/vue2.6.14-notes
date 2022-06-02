@@ -98,7 +98,8 @@ export default class Watcher {
         )
       }
     }
-    // 当是computed watcher的时候lazy为false
+    // 当是computed watcher的时候lazy为true
+    // 计算属性对应的方法是在模板中进行调用的，在render的过程中调用的，所以不需要进行求值
     this.value = this.lazy
       ? undefined
       : this.get()
@@ -114,10 +115,11 @@ export default class Watcher {
     let value
     const vm = this.vm
     try {
-      // 真正调用updateComponent渲染视图
+      // 对应渲染watcher，调用updateComponent渲染视图
+      // 对于用户watcher，则是获取属性
       value = this.getter.call(vm, vm)
     } catch (e) {
-      // 对于用户watcher的特殊处理
+      // 对于用户watcher的错误处理
       if (this.user) {
         handleError(e, vm, `getter for watcher "${this.expression}"`)
       } else {
@@ -180,6 +182,8 @@ export default class Watcher {
    */
   update () {
     /* istanbul ignore else */
+    // 当计算属性的watcher进行更新的时候，lazy为true
+    // 更新是在渲染watcher中进行更新的
     if (this.lazy) {
       this.dirty = true
     } else if (this.sync) {
@@ -214,11 +218,13 @@ export default class Watcher {
         // set new value
         const oldValue = this.value
         this.value = value
+        // user的作用
         if (this.user) {
           // 对于用户传入的cb，在一个具有错误处理的方法中进行调用
           const info = `callback for watcher "${this.expression}"`
           invokeWithErrorHandling(this.cb, this.vm, [value, oldValue], this.vm, info)
         } else {
+          // 对于不是用户传入的watcher直接调用cb
           this.cb.call(this.vm, value, oldValue)
         }
       }
