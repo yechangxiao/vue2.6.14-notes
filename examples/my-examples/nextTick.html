@@ -16,7 +16,7 @@
     const vm = new Vue({
       el: '#app',
       data: {
-        msg: 'hello world',
+        msg: '123',
       },
       methods: {
         test() {
@@ -26,7 +26,7 @@
               console.log(this.$refs.msg.innerHTML, 0)
             }
             )
-          this.msg = '12345'
+          this.msg = '456'
           Promise.resolve().then(
             () => {
               console.log(this.msg, 1)
@@ -38,6 +38,16 @@
             console.log(this.$refs.msg.innerHTML, 2)
           })
         }
+        // 会打印出456 0 | 123 0 | 456 2 | 456 2 | 456 1 | 456 1
+        // 首先将第一个Promise.resolve加入微任务队列
+        // 因为执行this.msg的时候会触发渲染watcher的update，将渲染watcher的cb放入callbacks中立即执行
+        // 调用timerFunc，将flushCallbacks函数放入Promise.resolve().then中执行，将flushCallbacks函数的执行加入到微任务队列
+        // 继续往下执行，将第二个Promise.resolve加入到微任务队列
+        // 执行this.$nextTick，将回调加入到渲染watcher的callbacks中
+        // 开始执行微任务，打印出第一个Promise.resolve的回调，此时还没有将DOM渲染到页面，所以页面是旧的
+        // 执行渲染的微任务，flushCallbacks函数被调用，函数里是直接执行callbacks里所有的回调
+        // 所以渲染DOM的操作和this.$nextTick中的回调依次被执行
+        // 所以打印出渲染后的456 2，然后才打印出第二个Promise.resolve的回调
       }
     })
   </script>
