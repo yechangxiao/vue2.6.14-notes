@@ -9,6 +9,7 @@
 <body>
   <div id="app">
     <h1>{{ arr }}</h1>
+    <!-- <h1>{{ obj }}</h1> -->
   </div>
   <script src="../../dist/vue.js"></script>
   <script>
@@ -16,9 +17,15 @@
       el: '#app',
       data: {
         arr: [2, 3, 4],
-        obj: {
-          age: 10
-        }
+        // obj: {
+        //   name: {
+        //     firstName: 'mike',
+        //     lastName: {
+        //       last: 'last',
+        //       name: 'name'
+        //     }
+        //   }
+        // }
       }
     })
   </script>

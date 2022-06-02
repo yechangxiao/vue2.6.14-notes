@@ -89,6 +89,8 @@ function flushSchedulerQueue () {
 
   // do not cache length because more watchers might be pushed
   // as we run existing watchers
+  // 不要缓存length，因为在处理过程中可能会加入新的watcher
+  // 在上一个函数中就处理过这种情况
   for (index = 0; index < queue.length; index++) {
     watcher = queue[index]
     // 创建渲染watcher才有，用于触发beforeUpdate钩子函数
@@ -98,6 +100,7 @@ function flushSchedulerQueue () {
     id = watcher.id
     // 将watcher id置为null，说明这个watcher已经被处理了，后面数据有变化的时候，可以再进行执行
     has[id] = null
+    // 核心执行run方法
     watcher.run()
     // in dev build, check and stop circular updates.
     if (process.env.NODE_ENV !== 'production' && has[id] != null) {
@@ -180,6 +183,7 @@ export function queueWatcher (watcher: Watcher) {
       // if already flushing, splice the watcher based on its id
       // if already past its id, it will be run next immediately.
       let i = queue.length - 1
+      // 获取正在处理的watcher的index，并将watcher放入index后的根据id排序的位置中
       while (i > index && queue[i].id > watcher.id) {
         i--
       }

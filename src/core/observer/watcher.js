@@ -117,6 +117,7 @@ export default class Watcher {
       // 真正调用updateComponent渲染视图
       value = this.getter.call(vm, vm)
     } catch (e) {
+      // 对于用户watcher的特殊处理
       if (this.user) {
         handleError(e, vm, `getter for watcher "${this.expression}"`)
       } else {
@@ -125,6 +126,7 @@ export default class Watcher {
     } finally {
       // "touch" every property so they are all tracked as
       // dependencies for deep watching
+      // 对于深度监听的属性，需要触发所有属性的watcher
       if (this.deep) {
         traverse(value)
       }
@@ -183,6 +185,7 @@ export default class Watcher {
     } else if (this.sync) {
       this.run()
     } else {
+      // 把当前watcher放到一个队列中
       queueWatcher(this)
     }
   }
@@ -194,12 +197,17 @@ export default class Watcher {
   run () {
     // watcher是否存活状态
     if (this.active) {
+      // 当是渲染watcher的时候，创建watcher的时候就会执行这个get方法
+      // 渲染watcher没有返回值，value为undefined
       const value = this.get()
       if (
         value !== this.value ||
         // Deep watchers and watchers on Object/Arrays should fire even
         // when the value is the same, because the value may
         // have mutated.
+        //深度监听和对象/数组上的监听应触发
+        //当值相同时，因为值可能
+        //已经变化了。
         isObject(value) ||
         this.deep
       ) {
@@ -207,6 +215,7 @@ export default class Watcher {
         const oldValue = this.value
         this.value = value
         if (this.user) {
+          // 对于用户传入的cb，在一个具有错误处理的方法中进行调用
           const info = `callback for watcher "${this.expression}"`
           invokeWithErrorHandling(this.cb, this.vm, [value, oldValue], this.vm, info)
         } else {

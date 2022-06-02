@@ -316,6 +316,7 @@ function initMethods (vm: Component, methods: Object) {
   }
 }
 
+// 处理完参数的差异后，最终还是调用vm.$watch()方法
 function initWatch (vm: Component, watch: Object) {
   for (const key in watch) {
     const handler = watch[key]
@@ -374,6 +375,7 @@ export function stateMixin (Vue: Class<Component>) {
   Vue.prototype.$set = set
   Vue.prototype.$delete = del
 
+  // $watch没有静态方法，因为$watch内部要使用vue的实例
   Vue.prototype.$watch = function (
     expOrFn: string | Function,
     cb: any,
