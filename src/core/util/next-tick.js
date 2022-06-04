@@ -107,6 +107,8 @@ export function nextTick (cb?: Function, ctx?: Object) {
     // 调用
     timerFunc()
   }
+  // 对于支持Promise的情况，nextTick返回一个Promise，支持通过then方法定义回调
+  // 但是在渲染watcher执行的时候，才会被resolved()，要注意通过then回调时候的执行顺序
   // $flow-disable-line
   if (!cb && typeof Promise !== 'undefined') {
     // 返回promise对象

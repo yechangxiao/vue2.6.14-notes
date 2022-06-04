@@ -37,7 +37,8 @@
             console.log(this.msg, 2)
             console.log(this.$refs.msg.innerHTML, 2)
           })
-        }
+          this.next()
+        },
         // 会打印出456 0 | 123 0 | 456 2 | 456 2 | 456 1 | 456 1
         // 首先将第一个Promise.resolve加入微任务队列
         // 因为执行this.msg的时候会触发渲染watcher的update，将渲染watcher的cb放入callbacks中立即执行
@@ -48,6 +49,19 @@
         // 执行渲染的微任务，flushCallbacks函数被调用，函数里是直接执行callbacks里所有的回调
         // 所以渲染DOM的操作和this.$nextTick中的回调依次被执行
         // 所以打印出渲染后的456 2，然后才打印出第二个Promise.resolve的回调
+        next() {
+          this.$nextTick().then(() => {
+            console.log(this.msg, 4)
+            console.log(this.$refs.msg.innerHTML, 4)
+          })
+          Promise.resolve().then(() => {
+            console.log(this.msg, 3)
+            console.log(this.$refs.msg.innerHTML, 3)
+          })
+        }
+        // 会先打印出456 3，再打印出456 4
+        // 在支持promise时，nextTick返回一个promise，而且在渲染watcher执行的时候才会被resolved
+        // 所以this.$nextTick()会比Promise.resolve()后加入到微任务队列
       }
     })
   </script>
