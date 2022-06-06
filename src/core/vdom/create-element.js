@@ -34,11 +34,13 @@ export function createElement (
   normalizationType: any,
   alwaysNormalize: boolean
 ): VNode | Array<VNode> {
+  // 判断第三个参数，如果是数组则有children或者原始值的话就是有文本内容，存在children中，实现类似函数重载机制
   if (Array.isArray(data) || isPrimitive(data)) {
     normalizationType = children
     children = data
     data = undefined
   }
+  // 判断是用户手写的render还是模板编译生成的render
   if (isTrue(alwaysNormalize)) {
     normalizationType = ALWAYS_NORMALIZE
   }
@@ -83,6 +85,7 @@ export function _createElement (
       )
     }
   }
+  // 处理作用域插槽
   // support single function children as default scoped slot
   if (Array.isArray(children) &&
     typeof children[0] === 'function'
@@ -91,19 +94,26 @@ export function _createElement (
     data.scopedSlots = { default: children[0] }
     children.length = 0
   }
+  // 处理children
   // 处理模板生成的render或者用户手写的render，把数组拍平成一维数组
   if (normalizationType === ALWAYS_NORMALIZE) {
-    // 返回一维数组，处理用户手写的render
+    // 用户手写render函数的时候调用
+    // 如果children是原始值的话转换成VNode的数组，保证子元素都是数组，方便处理
+    // 如果是数组的话继续处理数组中的元素，如果子元素还是数组(slot template)，递归处理
+    // 如果连续两个节点都是字符串会合并文本节点
     children = normalizeChildren(children)
   } else if (normalizationType === SIMPLE_NORMALIZE) {
     // 把二维数组，转换成一维数组
+    // 如果children中有函数组件的话，函数组件会返回数组形式
+    // 这时候children就是一个二维数组，只需要把二维数组转为一维数组
     children = simpleNormalizeChildren(children)
   }
   let vnode, ns
+  // 判断tag是字符串还是组件
   if (typeof tag === 'string') {
     let Ctor
     ns = (context.$vnode && context.$vnode.ns) || config.getTagNamespace(tag)
-    // 是否是html的保留标签
+    // 是否是html的保留标签，创建对应的VNode
     if (config.isReservedTag(tag)) {
       // platform built-in elements
       if (process.env.NODE_ENV !== 'production' && isDef(data) && isDef(data.nativeOn) && data.tag !== 'component') {

@@ -39,6 +39,7 @@ export default class VNode {
     componentOptions?: VNodeComponentOptions,
     asyncFactory?: Function
   ) {
+    // 基本只需要关心前5个参数和key
     this.tag = tag
     this.data = data
     this.children = children
@@ -49,6 +50,7 @@ export default class VNode {
     this.fnContext = undefined
     this.fnOptions = undefined
     this.fnScopeId = undefined
+    // 和snabbdom一样，是通过data传递的
     this.key = data && data.key
     this.componentOptions = componentOptions
     this.componentInstance = undefined

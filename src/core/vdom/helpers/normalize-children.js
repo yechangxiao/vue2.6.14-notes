@@ -18,6 +18,7 @@ import { isFalse, isTrue, isDef, isUndef, isPrimitive } from 'shared/util'
 export function simpleNormalizeChildren (children: any) {
   for (let i = 0; i < children.length; i++) {
     if (Array.isArray(children[i])) {
+      // 可以实现children数组中子元素依旧是数组情况下，拍平
       return Array.prototype.concat.apply([], children)
     }
   }
