@@ -38,6 +38,7 @@ const componentVNodeHooks = {
     if (
       vnode.componentInstance &&
       !vnode.componentInstance._isDestroyed &&
+      // 处理keepAlive的情况
       vnode.data.keepAlive
     ) {
       // kept-alive components, treat as a patch
@@ -111,6 +112,8 @@ export function createComponent (
 
   const baseCtor = context.$options._base
 
+  // 如果Ctor不是一个构造函数，是一个对象
+  // 使用Vue.extend()创造一个子组件的构造函数
   // plain options object: turn it into a constructor
   if (isObject(Ctor)) {
     Ctor = baseCtor.extend(Ctor)
@@ -182,11 +185,15 @@ export function createComponent (
     }
   }
 
+  // 安装组件的钩子函数init/prepatch/insert/destroy
+  // 准备好了data.hook中的钩子函数
   // install component management hooks onto the placeholder node
   installComponentHooks(data)
 
   // return a placeholder vnode
   const name = Ctor.options.name || tag
+  // 创建自定义组件的VNode，设置自定义组件的名字
+  // 记录this.componentOptions = componentOptions
   const vnode = new VNode(
     `vue-component-${Ctor.cid}${name ? `-${name}` : ''}`,
     data, undefined, undefined, undefined, context,
@@ -222,10 +229,13 @@ export function createComponentInstanceForVnode (
     options.render = inlineTemplate.render
     options.staticRenderFns = inlineTemplate.staticRenderFns
   }
+  // 创建组件实例
   return new vnode.componentOptions.Ctor(options)
 }
 
 function installComponentHooks (data: VNodeData) {
+  // 用户可以传递自定义钩子函数
+  // 把用户传入的自定义钩子函数和componentVNodeHooks中预定义的钩子函数合并
   const hooks = data.hook || (data.hook = {})
   for (let i = 0; i < hooksToMerge.length; i++) {
     const key = hooksToMerge[i]
