@@ -5,6 +5,8 @@ import { detectErrors } from './error-detector'
 import { createCompileToFunctionFn } from './to-function'
 
 export function createCompilerCreator (baseCompile: Function): Function {
+  // baseOptions 平台相关的options
+  // src/platforms/web/compiler/options.js中定义
   return function createCompiler (baseOptions: CompilerOptions) {
     function compile (
       template: string,

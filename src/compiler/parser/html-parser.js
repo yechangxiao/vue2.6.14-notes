@@ -51,6 +51,7 @@ function decodeAttr (value, shouldDecodeNewlines) {
   return value.replace(re, match => decodingMap[match])
 }
 
+// 参考了simplehtmlparser这个库
 export function parseHTML (html, options) {
   const stack = []
   const expectHTML = options.expectHTML

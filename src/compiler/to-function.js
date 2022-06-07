@@ -48,14 +48,17 @@ export function createCompileToFunctionFn (compile: Function): Function {
       }
     }
 
+    // 1. 读取缓存中的compiledFunctionResult对象，如果有直接返回
     // check cache
     const key = options.delimiters
+      // 处理完整版vue中的差值表达式
       ? String(options.delimiters) + template
       : template
     if (cache[key]) {
       return cache[key]
     }
 
+    // 2. 把模板编译为编译对象(render, staticRenderFns)，字符串形式的js代码
     // compile
     const compiled = compile(template, options)
 
@@ -90,6 +93,7 @@ export function createCompileToFunctionFn (compile: Function): Function {
     // turn code into functions
     const res = {}
     const fnGenErrors = []
+    // 3. 把字符串形式的js代码转换成js方法
     res.render = createFunction(compiled.render, fnGenErrors)
     res.staticRenderFns = compiled.staticRenderFns.map(code => {
       return createFunction(code, fnGenErrors)
@@ -109,6 +113,7 @@ export function createCompileToFunctionFn (compile: Function): Function {
       }
     }
 
+    // 4. 缓存并返回res对象(render, staticRenderFns方法)
     return (cache[key] = res)
   }
 }
