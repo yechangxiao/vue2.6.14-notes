@@ -193,7 +193,9 @@ function initComputed (vm: Component, computed: Object) {
   // computed properties are just getters during SSR
   const isSSR = isServerRendering()
 
+  // 遍历用户定义的计算属性 computed: { a() {}, b: { get: ..., set: ... } }
   for (const key in computed) {
+    // 获取计算属性的值
     const userDef = computed[key]
     // 计算属性可以定义成函数或者具有get/set的对象
     const getter = typeof userDef === 'function' ? userDef : userDef.get
@@ -205,11 +207,15 @@ function initComputed (vm: Component, computed: Object) {
     }
 
     if (!isSSR) {
+      // 如果不是服务端渲染，创建每个计算属性对应的watcher对象，记录到vm._computedWatchers中
+      // 计算属性的lazy为true，创建watcher的时候不会立即进行求值，在渲染watcher中求值
       // create internal watcher for the computed property.
       watchers[key] = new Watcher(
         vm,
+        // getter为属性对应的function
         getter || noop,
         noop,
+        // 常量，lazy = true
         computedWatcherOptions
       )
     }
@@ -217,6 +223,7 @@ function initComputed (vm: Component, computed: Object) {
     // component-defined computed properties are already defined on the
     // component prototype. We only need to define computed properties defined
     // at instantiation here.
+    // 如果vm上没有当前计算属性的名字，则在vm上定义该计算属性，否则在开发环境下发送该属性已被定义的警告
     if (!(key in vm)) {
       defineComputed(vm, key, userDef)
     } else if (process.env.NODE_ENV !== 'production') {
@@ -236,9 +243,11 @@ export function defineComputed (
   key: string,
   userDef: Object | Function
 ) {
+  // 不是服务端渲染，则需要进行缓存
   const shouldCache = !isServerRendering()
   if (typeof userDef === 'function') {
     sharedPropertyDefinition.get = shouldCache
+      // 值是通过watcher进行计算的
       ? createComputedGetter(key)
       : createGetterInvoker(userDef)
     sharedPropertyDefinition.set = noop
@@ -259,14 +268,21 @@ export function defineComputed (
       )
     }
   }
+  // 给vm对象上定义该计算属性
   Object.defineProperty(target, key, sharedPropertyDefinition)
 }
 
 function createComputedGetter (key) {
   return function computedGetter () {
+    // 获取该计算属性对应的watcher对象
     const watcher = this._computedWatchers && this._computedWatchers[key]
     if (watcher) {
+      // 这个位置起到缓存的作用
+      // 第一次访问计算属性的时候dirty为true，执行evaluate获取计算属性的值，并把dirty置为false
+      // 再次访问计算属性，dirty的值如果依然为false，不执行evaluate，直接返回watcher.value
+      // 当数据变化后调用watcher.update方法，把dirty改变为true，如果dirty为true才会执行重新求值
       if (watcher.dirty) {
+        // 就是执行get方法，也就是计算属性求值，然后将dirty置为false
         watcher.evaluate()
       }
       if (Dep.target) {
