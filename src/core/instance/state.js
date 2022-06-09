@@ -404,6 +404,7 @@ export function stateMixin (Vue: Class<Component>) {
   ): Function {
     // 获取Vue实例this
     const vm: Component = this
+    // 在createWatcher中也判断了cb是否是对象，因为$watch可以单独调用，所以出现了重复判断的情况
     if (isPlainObject(cb)) {
       // 判断如果cb是对象，执行createWatcher继续对象进行解析
       return createWatcher(vm, expOrFn, cb, options)

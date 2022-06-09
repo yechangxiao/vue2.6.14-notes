@@ -9,7 +9,7 @@
 <body>
   <div id="app">
     <!-- <h1>{{ obj.fullName }}</h1> -->
-    <h1>{{ reversedMsg }}</h1>
+    <!-- <h1>{{ reversedMsg }}</h1> -->
     <button @click="doIt">1123</button>
   </div>
   <script src="../../dist/vue.js"></script>
@@ -18,37 +18,42 @@
       el: '#app',
       data: {
         msg: 'hello world',
+        reversedMsg: '123'
         // obj: {
         //   fName: '汤姆',
         //   lName: '丁',
         //   fullName: ''
         // }
       },
-      computed: {
-        reversedMsg() {
-          return this.msg.split('').reverse().join('')
-        }
-      },
+      // computed: {
+      //   reversedMsg() {
+      //     return this.msg.split('').reverse().join('')
+      //   }
+      // },
       methods: {
         doIt() {
           this.msg = '23424'
           console.log('dd', this.reversedMsg);
           
         }
-      }
-      // watch: {
-      //   reversedMsg(newV, oldV) {
-      //     console.log('no', newV, oldV);
+      },
+      watch: {
+        reversedMsg:{
+          handler(newV, oldV) {
+
+            console.log('no', newV, oldV);
+          },
+          immediate: true
           
-      //   }
-      //   obj: {
-      //     handler(newV, oldV) {
-      //       this.obj.fullName = newV.fName + '' + newV.lName
-      //     },
-      //     deep: true,
-      //     immediate: true
-      //   }
-      // }
+        },
+        // obj: {
+        //   handler(newV, oldV) {
+        //     this.obj.fullName = newV.fName + '' + newV.lName
+        //   },
+        //   deep: true,
+        //   immediate: true
+        // }
+      }
     })
   </script>
 </body>

@@ -11,6 +11,7 @@ export function renderSlot (
   props: ?Object,
   bindObject: ?Object
 ): ?Array<VNode> {
+  // 获取插槽的render函数
   const scopedSlotFn = this.$scopedSlots[name]
   let nodes
   if (scopedSlotFn) {
@@ -27,6 +28,7 @@ export function renderSlot (
       (typeof fallbackRender === 'function' ? fallbackRender() : fallbackRender)
   } else {
     nodes =
+      // 获取插槽的vnode
       this.$slots[name] ||
       (typeof fallbackRender === 'function' ? fallbackRender() : fallbackRender)
   }
