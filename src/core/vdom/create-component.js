@@ -109,7 +109,7 @@ export function createComponent (
   if (isUndef(Ctor)) {
     return
   }
-
+  // 获取Vue构造函数
   const baseCtor = context.$options._base
 
   // 如果Ctor不是一个构造函数，是一个对象
